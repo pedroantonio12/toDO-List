@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Novo Lembrete</h1>
+        <input type="text" id="botaoTarefaNome" placeholder="Nome do lembrete"> 
+        <input type="date" id="botaoTarefaData" placeholder="Data do lembrete">
+        <button onclick="addLembrete()">Criar</button>
+        <h2>Lista de Lembretes</h2>
+        <ul id="listaLembrete"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        const listaTarefas = document.getElementById("listaLembrete");
+        const botaoLembrete = document.getElementById("botaoTarefaNome");
+        const botaoData = document.getElementById("botaoTarefaData");
+
+        const lembretesPorData = {};
+
+        function addLembrete() {
+            const tarefa = botaoLembrete.value.trim();
+            const dataAtual = new Date();
+            const dataValue = botaoData.value;
+            const [ano, mes, dia] = dataValue.split("-");
+            const dataInserida = new Date(ano, mes - 1, dia);
+
+            if (dataValue === "") {
+                alert("Preencha o campo de data!");
+            } else if (isNaN(dataInserida) || dataInserida < dataAtual) {
+                alert("A data deve ser válida e no futuro!");
+            } else if (tarefa !== "") {
+                const data = `${String(dataInserida.getDate()).padStart(2, '0')}/${String(dataInserida.getMonth() + 1).padStart(2, '0')}/${dataInserida.getFullYear()}`;
+
+                if (!lembretesPorData[data]) {
+                    lembretesPorData[data] = [];
+                }
+
+                const novoLembrete = {
+                    texto: tarefa,
+                    data: data
+                };
+
+                lembretesPorData[data].push(novoLembrete);
+                atualizarListaLembretes();
+
+                botaoLembrete.value = "";
+                botaoData.value = "";
+            } else {
+                alert("Preencha o campo!");
+            }
+        }
+
+        function atualizarListaLembretes() {
+            listaTarefas.innerHTML = "";
+
+            for (const data in lembretesPorData) {
+                if (lembretesPorData.hasOwnProperty(data)) {
+                    const lembretes = lembretesPorData[data];
+
+                    lembretes.forEach((lembrete) => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            <span>${lembrete.data}</span><br>
+                            <span>${lembrete.texto}</span><br>
+                            <button class="removerBotao" onClick="deletarBotao('${data}', '${lembrete.texto}')">Remover</button>
+                        `;
+                        listaTarefas.appendChild(li);
+                    });
+                }
+            }
+        }
+
+        function deletarBotao(data, texto) {
+            lembretesPorData[data] = lembretesPorData[data].filter(lembrete => lembrete.texto !== texto);
+            atualizarListaLembretes();
+        }
+    </script>
+</body>
+</html>
