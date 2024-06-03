@@ -1,6 +1,3 @@
-# Processo Seletivo
-
- Código desenvolvido como parte do processo seletivo.
 
 Premissas Assumidas
 ----------------------------------------------
